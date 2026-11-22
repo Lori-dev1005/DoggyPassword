@@ -5,12 +5,17 @@ from flask import Flask, render_template, request
 from password_generator import PasswordGenerator
 from password_validator import PasswordValidator
 
-
 app = Flask(__name__, template_folder=".", static_folder="../static")
+
+#visitor counter
+visits = 0
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    global visits
+    visits += 1
+
     length = 12
     password = ""
     error = ""
@@ -30,12 +35,14 @@ def index():
                 password = PasswordGenerator(length).generate()
 
     password_is_valid = bool(password) and PasswordValidator(password).is_valid()
+
     return render_template(
         "password.html",
         password=password,
         length=length,
         error=error,
         password_is_valid=password_is_valid,
+        visits=visits
     )
 
 
@@ -43,5 +50,6 @@ if __name__ == "__main__" and "--console" in sys.argv[1:]:
     length = int(input("Enter Length: "))
     password = PasswordGenerator(length).generate()
     print("Your random password is: ", password)
+
 elif __name__ == "__main__":
     app.run(debug=True)
